@@ -22,4 +22,6 @@ The first vertical slice exposes organization endpoints:
 - `POST /api/v1/organizations`
 - `PATCH /api/v1/organizations/:id/status`
 
+Access configuration endpoints are available under `/api/v1/access` for business units, departments, stores, roles, permissions, users, and user assignments.
+
 The database migration includes the initial organization/access foundation tables for companies, business units, departments, stores, roles, permissions, users, and scoped user assignments. Additional endpoints and policy configuration will be added incrementally.

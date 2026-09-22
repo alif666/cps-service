@@ -31,6 +31,28 @@
         "body": { "mode": "raw", "raw": "{\n  \"isActive\": false\n}" },
         "url": "{{baseUrl}}/api/v1/organizations/{{organizationId}}/status"
       }
+    },
+    {
+      "name": "List roles",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/access/roles" }
+    },
+    {
+      "name": "Create role",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"code\": \"UNIT_HEAD\",\n  \"name\": \"Unit Head\"\n}" },
+        "url": "{{baseUrl}}/api/v1/access/roles"
+      }
+    },
+    {
+      "name": "Create user",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"employeeCode\": \"DEV-001\",\n  \"fullName\": \"Development User\",\n  \"email\": \"dev@example.com\"\n}" },
+        "url": "{{baseUrl}}/api/v1/access/users"
+      }
     }
   ]
 }

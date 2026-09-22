@@ -3,6 +3,9 @@ import {pool} from './db/pool';
 import {PostgresOrganizationRepository} from './modules/organization/repository';
 import {organizationRouter} from './modules/organization/routes';
 import {OrganizationService} from './modules/organization/service';
+import {PostgresAccessRepository} from './modules/access/repository';
+import {accessRouter} from './modules/access/routes';
+import {AccessService} from './modules/access/service';
 
 export const createApp = () => {
     const app = express();
@@ -11,6 +14,7 @@ export const createApp = () => {
 
     const organizationService = new OrganizationService(new PostgresOrganizationRepository(pool));
     app.use('/api/v1/organizations', organizationRouter(organizationService));
+    app.use('/api/v1/access', accessRouter(new AccessService(new PostgresAccessRepository(pool))));
 
     const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
         if (error?.name === 'ZodError') return res.status(400).json({
