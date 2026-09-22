@@ -7,7 +7,7 @@ const scopedSchema = z.object({ companyId: z.string().uuid(), businessUnitId: z.
 const departmentSchema = z.object({ businessUnitId: z.string().uuid(), code: code.max(50), name });
 const roleSchema = z.object({ code, name: z.string().trim().min(2).max(120), description: z.string().trim().max(500).optional() });
 const permissionSchema = roleSchema;
-const userSchema = z.object({ employeeCode: code, fullName: name, email: z.string().email().max(320) });
+const userSchema = z.object({ employeeCode: code, fullName: name, email: z.string().email().max(320), password: z.string().min(12).max(200) });
 const assignmentSchema = z.object({ userId: z.string().uuid(), companyId: z.string().uuid(), businessUnitId: z.string().uuid().optional(), departmentId: z.string().uuid().optional(), roleId: z.string().uuid(), effectiveFrom: z.string().date().optional(), effectiveTo: z.string().date().optional() });
 
 export class AccessService {

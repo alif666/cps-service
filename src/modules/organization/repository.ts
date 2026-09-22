@@ -1,5 +1,5 @@
 import {Pool} from 'pg';
-import {CreateOrganizationInput, Organization, OrganizationRepository} from './types';
+import {CreateOrganizationInput, Organization, OrganizationRepository, UpdateOrganizationInput} from './types';
 
 const mapRow = (row: Record<string, unknown>): Organization => ({
     id: String(row.id),
@@ -26,6 +26,14 @@ export class PostgresOrganizationRepository implements OrganizationRepository {
             [input.code, input.name],
         );
         return mapRow(result.rows[0]);
+    }
+
+    async update(id: string, input: UpdateOrganizationInput): Promise<Organization | null> {
+        const result = await this.db.query(
+            `UPDATE companies SET code = COALESCE($2, code), name = COALESCE($3, name), updated_at = NOW()
+             WHERE id = $1 RETURNING *`, [id, input.code ?? null, input.name ?? null],
+        );
+        return result.rows[0] ? mapRow(result.rows[0]) : null;
     }
 
     async setActive(id: string, isActive: boolean): Promise<Organization | null> {

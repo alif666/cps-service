@@ -11,7 +11,7 @@ export type CreateScopedEntityInput = { companyId: string; code: string; name: s
 export type CreateDepartmentInput = { businessUnitId: string; code: string; name: string };
 export type CreateRoleInput = { code: string; name: string; description?: string };
 export type CreatePermissionInput = { code: string; name: string; description?: string };
-export type CreateUserInput = { employeeCode: string; fullName: string; email: string };
+export type CreateUserInput = { employeeCode: string; fullName: string; email: string; password: string };
 export type CreateAssignmentInput = { userId: string; companyId: string; businessUnitId?: string; departmentId?: string; roleId: string; effectiveFrom?: string; effectiveTo?: string };
 
 export type User = { id: string; employeeCode: string; fullName: string; email: string; isActive: boolean; createdAt: string; updatedAt: string };

@@ -24,7 +24,7 @@ describe('AccessService', () => {
   });
 
   it('rejects an invalid user email before persistence', async () => {
-    await expect(service.createUser({ employeeCode: 'E-1', fullName: 'Test User', email: 'invalid' })).rejects.toThrow();
+    await expect(service.createUser({ employeeCode: 'E-1', fullName: 'Test User', email: 'invalid', password: 'ChangeMe123!' })).rejects.toThrow();
     expect(repository.createUser).not.toHaveBeenCalled();
   });
 });

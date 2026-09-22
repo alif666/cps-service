@@ -3,22 +3,32 @@
     "name": "ABC Group CPS Service",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
-  "variable": [{ "key": "baseUrl", "value": "http://localhost:3000" }, { "key": "organizationId", "value": "" }],
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:3000" }, { "key": "organizationId", "value": "" }, { "key": "accessToken", "value": "" }],
   "item": [
     {
       "name": "Health",
       "request": { "method": "GET", "url": "{{baseUrl}}/health" }
     },
     {
+      "name": "Login (development)",
+      "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "pm.collectionVariables.set('accessToken', body.data.accessToken);"] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@cps.local\",\n  \"password\": \"ChangeMe123!\"\n}" },
+        "url": "{{baseUrl}}/api/v1/auth/login"
+      }
+    },
+    {
       "name": "List organizations",
-      "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/organizations" }
+      "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/api/v1/organizations" }
     },
     {
       "name": "Create organization",
       "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "pm.collectionVariables.set('organizationId', body.data.id);"] } }],
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{accessToken}}" }],
         "body": { "mode": "raw", "raw": "{\n  \"code\": \"ABC\",\n  \"name\": \"ABC Group\"\n}" },
         "url": "{{baseUrl}}/api/v1/organizations"
       }
@@ -27,20 +37,29 @@
       "name": "Deactivate organization",
       "request": {
         "method": "PATCH",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{accessToken}}" }],
         "body": { "mode": "raw", "raw": "{\n  \"isActive\": false\n}" },
         "url": "{{baseUrl}}/api/v1/organizations/{{organizationId}}/status"
       }
     },
     {
+      "name": "Update organization",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"ABC Group Updated\"\n}" },
+        "url": "{{baseUrl}}/api/v1/organizations/{{organizationId}}"
+      }
+    },
+    {
       "name": "List roles",
-      "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/access/roles" }
+      "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/api/v1/access/roles" }
     },
     {
       "name": "Create role",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{accessToken}}" }],
         "body": { "mode": "raw", "raw": "{\n  \"code\": \"UNIT_HEAD\",\n  \"name\": \"Unit Head\"\n}" },
         "url": "{{baseUrl}}/api/v1/access/roles"
       }
@@ -49,8 +68,8 @@
       "name": "Create user",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
-        "body": { "mode": "raw", "raw": "{\n  \"employeeCode\": \"DEV-001\",\n  \"fullName\": \"Development User\",\n  \"email\": \"dev@example.com\"\n}" },
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+        "body": { "mode": "raw", "raw": "{\n  \"employeeCode\": \"DEV-001\",\n  \"fullName\": \"Development User\",\n  \"email\": \"dev@example.com\",\n  \"password\": \"ChangeMe123!\"\n}" },
         "url": "{{baseUrl}}/api/v1/access/users"
       }
     }

@@ -8,7 +8,7 @@ const organization = {
 
 describe('OrganizationService', () => {
   const repository: jest.Mocked<OrganizationRepository> = {
-    list: jest.fn(), create: jest.fn(), setActive: jest.fn(),
+    list: jest.fn(), create: jest.fn(), update: jest.fn(), setActive: jest.fn(),
   };
   const service = new OrganizationService(repository);
 
@@ -28,5 +28,11 @@ describe('OrganizationService', () => {
   it('fails clearly when activating an unknown organization', async () => {
     repository.setActive.mockResolvedValue(null);
     await expect(service.setActive('missing', true)).rejects.toThrow('Organization not found');
+  });
+
+  it('updates an organization with validated fields', async () => {
+    repository.update.mockResolvedValue({ ...organization, name: 'ABC Group Updated' });
+    await expect(service.update('org-1', { name: 'ABC Group Updated' })).resolves.toMatchObject({ name: 'ABC Group Updated' });
+    expect(repository.update).toHaveBeenCalledWith('org-1', { name: 'ABC Group Updated' });
   });
 });

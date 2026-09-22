@@ -2,5 +2,6 @@ import 'dotenv/config';
 
 export const config = {
     port: Number(process.env.PORT ?? 3000),
-    databaseUrl: process.env.DATABASE_URL ?? 'postgres://cps:cps@localhost:5432/cps',
+  databaseUrl: process.env.DATABASE_URL ?? 'postgres://cps:cps@localhost:5432/cps',
+  jwtSecret: process.env.JWT_SECRET ?? 'local-development-only-change-me',
 };

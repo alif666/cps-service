@@ -21,6 +21,10 @@ export const organizationRouter = (service: OrganizationService): Router => {
         }
     });
 
+    router.patch('/:id', async (req, res, next) => {
+        try { res.json({data: await service.update(req.params.id, req.body)}); } catch (error) { next(error); }
+    });
+
     router.patch('/:id/status', async (req, res, next) => {
         try {
             const input = z.object({isActive: z.boolean()}).parse(req.body);

@@ -29,6 +29,17 @@ services:
       postgres:
         condition: service_healthy
 
+  development-seed:
+    image: postgres:16-alpine
+    command: psql -h postgres -U cps -d cps -f /seed/development.sql
+    environment:
+      PGPASSWORD: cps
+    volumes:
+      - ./db/seed/development.sql:/seed/development.sql:ro
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+
   api:
     build: .
     environment:
@@ -37,7 +48,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      flyway:
+      development-seed:
         condition: service_completed_successfully
 
 volumes:
