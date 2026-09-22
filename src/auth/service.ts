@@ -11,7 +11,7 @@ export class AuthService {
     const credentials = loginSchema.parse(input);
     const user = await this.repository.findByEmail(credentials.email);
     if (!user || !user.isActive || !user.passwordHash || !(await bcrypt.compare(credentials.password, user.passwordHash))) throw Object.assign(new Error('Invalid credentials'), { statusCode: 401 });
-    const token = jwt.sign({ sub: user.id, email: user.email, permissions: user.permissions }, config.jwtSecret, { expiresIn: '1h' });
-    return { accessToken: token, user: { id: user.id, email: user.email, fullName: user.fullName, permissions: user.permissions } };
+    const token = jwt.sign({ sub: user.id, email: user.email, roles: user.roles, permissions: user.permissions }, config.jwtSecret, { expiresIn: '1h' });
+    return { accessToken: token, user: { id: user.id, email: user.email, fullName: user.fullName, roles: user.roles, permissions: user.permissions } };
   }
 }

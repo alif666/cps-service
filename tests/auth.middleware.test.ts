@@ -17,7 +17,7 @@ describe('authorization middleware', () => {
   });
 
   it('rejects a valid token without the required permission', async () => {
-    const token = jwt.sign({ sub: 'user-1', permissions: [] }, config.jwtSecret);
+    const token = jwt.sign({ sub: 'user-1', roles: [], permissions: [] }, config.jwtSecret);
     await request(app()).get('/protected').set('Authorization', `Bearer ${token}`).expect(403);
   });
 });

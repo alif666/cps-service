@@ -26,6 +26,8 @@ The first vertical slice exposes organization endpoints:
 
 All organization and access-configuration endpoints require a bearer token with the appropriate server-side permission. Login is available at `POST /api/v1/auth/login`. DOA configuration is available under `/api/v1/doa-rules` with the `doa.manage` permission.
 
+Permissions are assigned to roles, not directly to users. The login response and JWT include the user's active, scoped roles plus the effective permissions inherited from those roles. Authorization checks use permissions; roles are retained for identity, scope, and auditing.
+
 Access configuration endpoints are available under `/api/v1/access` for business units, departments, stores, roles, permissions, users, and user assignments.
 
 The database migration includes the initial organization/access foundation tables for companies, business units, departments, stores, roles, permissions, users, and scoped user assignments. Additional endpoints and policy configuration will be added incrementally.
