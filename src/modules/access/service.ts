@@ -20,6 +20,7 @@ export class AccessService {
   async createStore(input: CreateScopedEntityInput) { return this.repository.createStore(scopedSchema.parse(input)); }
   listRoles() { return this.repository.listRoles(); }
   async createRole(input: CreateRoleInput) { return this.repository.createRole(roleSchema.parse(input)); }
+  async assignRolePermissions(roleId: string, permissionIds: string[]) { return this.repository.assignRolePermissions(z.string().uuid().parse(roleId), z.array(z.string().uuid()).parse(permissionIds)); }
   listPermissions() { return this.repository.listPermissions(); }
   async createPermission(input: CreatePermissionInput) { return this.repository.createPermission(permissionSchema.parse(input)); }
   listUsers() { return this.repository.listUsers(); }

@@ -4,7 +4,7 @@ import { AccessService } from '../src/modules/access/service';
 describe('AccessService', () => {
   const repository: jest.Mocked<AccessRepository> = {
     listBusinessUnits: jest.fn(), createBusinessUnit: jest.fn(), listDepartments: jest.fn(), createDepartment: jest.fn(),
-    listStores: jest.fn(), createStore: jest.fn(), listRoles: jest.fn(), createRole: jest.fn(), listPermissions: jest.fn(),
+    listStores: jest.fn(), createStore: jest.fn(), listRoles: jest.fn(), createRole: jest.fn(), assignRolePermissions: jest.fn(), listPermissions: jest.fn(),
     createPermission: jest.fn(), listUsers: jest.fn(), createUser: jest.fn(), createAssignment: jest.fn(),
   };
   const service = new AccessService(repository);
@@ -17,7 +17,7 @@ describe('AccessService', () => {
   });
 
   it('validates and delegates role creation', async () => {
-    const role = { id: 'role-1', code: 'UNIT_HEAD', name: 'Unit Head', isActive: true, createdAt: '', updatedAt: '' };
+    const role = { id: 'role-1', code: 'UNIT_HEAD', name: 'Unit Head', permissionIds: [], isActive: true, createdAt: '', updatedAt: '' };
     repository.createRole.mockResolvedValue(role);
     await expect(service.createRole({ code: 'UNIT_HEAD', name: 'Unit Head' })).resolves.toEqual(role);
     expect(repository.createRole).toHaveBeenCalledWith({ code: 'UNIT_HEAD', name: 'Unit Head' });

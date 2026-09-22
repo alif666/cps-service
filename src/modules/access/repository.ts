@@ -7,7 +7,7 @@ const dates = (row: Record<string, unknown>) => ({
   updatedAt: new Date(String(row.updated_at)).toISOString(),
 });
 const entity = (row: Record<string, unknown>): AccessEntity => ({ id: String(row.id), code: String(row.code), name: String(row.name), isActive: Boolean(row.is_active), ...dates(row) });
-const role = (row: Record<string, unknown>): Role => ({ id: String(row.id), code: String(row.code), name: String(row.name), description: row.description ? String(row.description) : undefined, isActive: Boolean(row.is_active), ...dates(row) });
+const role = (row: Record<string, unknown>): Role => ({ id: String(row.id), code: String(row.code), name: String(row.name), description: row.description ? String(row.description) : undefined, permissionIds: Array.isArray(row.permission_ids) ? row.permission_ids.map(String) : [], isActive: Boolean(row.is_active), ...dates(row) });
 const permission = (row: Record<string, unknown>): Permission => ({ id: String(row.id), code: String(row.code), name: String(row.name), description: row.description ? String(row.description) : undefined, createdAt: new Date(String(row.created_at)).toISOString() });
 const user = (row: Record<string, unknown>): User => ({ id: String(row.id), employeeCode: String(row.employee_code), fullName: String(row.full_name), email: String(row.email), isActive: Boolean(row.is_active), ...dates(row) });
 
@@ -19,8 +19,20 @@ export class PostgresAccessRepository implements AccessRepository {
   async createDepartment(i: CreateDepartmentInput) { const r = await this.db.query('INSERT INTO departments (business_unit_id, code, name) SELECT id, $2, $3 FROM business_units WHERE id = $1 AND is_active = TRUE RETURNING *', [i.businessUnitId, i.code, i.name]); if (!r.rows[0]) throw new Error('Business unit not found or inactive'); return entity(r.rows[0]); }
   async listStores(companyId: string) { const r = await this.db.query('SELECT * FROM stores WHERE company_id = $1 ORDER BY name', [companyId]); return r.rows.map(entity); }
   async createStore(i: CreateScopedEntityInput) { const r = await this.db.query(`INSERT INTO stores (company_id, business_unit_id, code, name, location) SELECT c.id, bu.id, $3, $4, $5 FROM companies c LEFT JOIN business_units bu ON bu.id = $2 AND bu.company_id = c.id AND bu.is_active = TRUE WHERE c.id = $1 AND c.is_active = TRUE RETURNING stores.*`, [i.companyId, i.businessUnitId ?? null, i.code, i.name, i.location ?? null]); if (!r.rows[0]) throw new Error('Company or business unit not found or inactive'); return entity(r.rows[0]); }
-  async listRoles() { const r = await this.db.query('SELECT * FROM roles ORDER BY name'); return r.rows.map(role); }
-  async createRole(i: CreateRoleInput) { const r = await this.db.query('INSERT INTO roles (code, name, description) VALUES ($1, $2, $3) RETURNING *', [i.code, i.name, i.description ?? null]); return role(r.rows[0]); }
+  async listRoles() { const r = await this.db.query(`SELECT r.*, COALESCE(array_agg(rp.permission_id) FILTER (WHERE rp.permission_id IS NOT NULL), '{}') AS permission_ids FROM roles r LEFT JOIN role_permissions rp ON rp.role_id = r.id GROUP BY r.id ORDER BY r.name`); return r.rows.map(role); }
+  async createRole(i: CreateRoleInput) { const r = await this.db.query(`INSERT INTO roles (code, name, description) VALUES ($1, $2, $3) RETURNING *, '{}'::uuid[] AS permission_ids`, [i.code, i.name, i.description ?? null]); return role(r.rows[0]); }
+  async assignRolePermissions(roleId: string, permissionIds: string[]) {
+    const client = await this.db.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('DELETE FROM role_permissions WHERE role_id = $1', [roleId]);
+      if (permissionIds.length) await client.query('INSERT INTO role_permissions (role_id, permission_id) SELECT $1, id FROM permissions WHERE id = ANY($2::uuid[])', [roleId, permissionIds]);
+      const result = await client.query(`SELECT r.*, COALESCE(array_agg(rp.permission_id) FILTER (WHERE rp.permission_id IS NOT NULL), '{}') AS permission_ids FROM roles r LEFT JOIN role_permissions rp ON rp.role_id = r.id WHERE r.id = $1 GROUP BY r.id`, [roleId]);
+      await client.query('COMMIT');
+      if (!result.rows[0]) throw new Error('Role not found');
+      return role(result.rows[0]);
+    } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
+  }
   async listPermissions() { const r = await this.db.query('SELECT * FROM permissions ORDER BY code'); return r.rows.map(permission); }
   async createPermission(i: CreatePermissionInput) { const r = await this.db.query('INSERT INTO permissions (code, name, description) VALUES ($1, $2, $3) RETURNING *', [i.code, i.name, i.description ?? null]); return permission(r.rows[0]); }
   async listUsers() { const r = await this.db.query('SELECT * FROM users ORDER BY full_name'); return r.rows.map(user); }

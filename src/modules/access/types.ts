@@ -15,7 +15,7 @@ export type CreateUserInput = { employeeCode: string; fullName: string; email: s
 export type CreateAssignmentInput = { userId: string; companyId: string; businessUnitId?: string; departmentId?: string; roleId: string; effectiveFrom?: string; effectiveTo?: string };
 
 export type User = { id: string; employeeCode: string; fullName: string; email: string; isActive: boolean; createdAt: string; updatedAt: string };
-export type Role = { id: string; code: string; name: string; description?: string; isActive: boolean; createdAt: string; updatedAt: string };
+export type Role = { id: string; code: string; name: string; description?: string; permissionIds: string[]; isActive: boolean; createdAt: string; updatedAt: string };
 export type Permission = { id: string; code: string; name: string; description?: string; createdAt: string };
 export type Assignment = CreateAssignmentInput & { effectiveFrom: string; effectiveTo?: string };
 
@@ -28,6 +28,7 @@ export interface AccessRepository {
   createStore(input: CreateScopedEntityInput): Promise<AccessEntity>;
   listRoles(): Promise<Role[]>;
   createRole(input: CreateRoleInput): Promise<Role>;
+  assignRolePermissions(roleId: string, permissionIds: string[]): Promise<Role>;
   listPermissions(): Promise<Permission[]>;
   createPermission(input: CreatePermissionInput): Promise<Permission>;
   listUsers(): Promise<User[]>;

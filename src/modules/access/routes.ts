@@ -13,6 +13,7 @@ export const accessRouter = (service: AccessService): Router => {
   router.post('/stores', asyncRoute((req) => service.createStore(req.body)));
   router.get('/roles', asyncRoute((_,) => service.listRoles()));
   router.post('/roles', asyncRoute((req) => service.createRole(req.body)));
+  router.patch('/roles/:roleId/permissions', asyncRoute((req) => service.assignRolePermissions(req.params.roleId, req.body.permissionIds)));
   router.get('/permissions', asyncRoute((_,) => service.listPermissions()));
   router.post('/permissions', asyncRoute((req) => service.createPermission(req.body)));
   router.get('/users', asyncRoute((_,) => service.listUsers()));
