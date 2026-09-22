@@ -1,0 +1,36 @@
+{
+  "info": {
+    "name": "ABC Group CPS Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:3000" }, { "key": "organizationId", "value": "" }],
+  "item": [
+    {
+      "name": "Health",
+      "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+    },
+    {
+      "name": "List organizations",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/organizations" }
+    },
+    {
+      "name": "Create organization",
+      "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "pm.collectionVariables.set('organizationId', body.data.id);"] } }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"code\": \"ABC\",\n  \"name\": \"ABC Group\"\n}" },
+        "url": "{{baseUrl}}/api/v1/organizations"
+      }
+    },
+    {
+      "name": "Deactivate organization",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"isActive\": false\n}" },
+        "url": "{{baseUrl}}/api/v1/organizations/{{organizationId}}/status"
+      }
+    }
+  ]
+}

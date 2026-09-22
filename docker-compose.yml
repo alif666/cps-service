@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: cps
+      POSTGRES_USER: cps
+      POSTGRES_PASSWORD: cps
+    ports:
+      - "5432:5432"
+    volumes:
+      - cps-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cps -d cps"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  flyway:
+    image: flyway/flyway:10-alpine
+    command: -connectRetries=60 migrate
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/cps
+      FLYWAY_USER: cps
+      FLYWAY_PASSWORD: cps
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql
+    volumes:
+      - ./db/migrations:/flyway/sql:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: .
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://cps:cps@postgres:5432/cps
+    ports:
+      - "3000:3000"
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+
+volumes:
+  cps-postgres-data:
