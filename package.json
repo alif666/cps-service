@@ -6,6 +6,7 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
+    "bootstrap:admin": "tsx scripts/bootstrap-admin.ts",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "lint": "tsc --noEmit"
