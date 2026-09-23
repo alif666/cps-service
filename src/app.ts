@@ -39,3 +39,8 @@ export const createApp = () => {
     app.use(errorHandler);
     return app;
 };
+
+// Vercel detects this module as the Express entrypoint and requires a
+// default-exported application. The local server continues to call
+// createApp() explicitly from src/server.ts.
+export default createApp();
